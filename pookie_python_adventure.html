@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pookie Python Adventure</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --pink: #e91e8c;
+  --pink-light: #fce4ec;
+  --pink-mid: #f48fb1;
+  --pink-dark: #880e4f;
+  --purple: #9c27b0;
+  --purple-light: #f3e5f5;
+  --cream: #fff8fb;
+  --text: #3d0026;
+  --muted: #ad1457;
+  --green: #00897b;
+  --green-light: #e0f2f1;
+  --red-light: #fce4ec;
+  --red: #c62828;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: var(--cream);
+  background-image: radial-gradient(circle at 20% 20%, #fce4ec 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, #f3e5f5 0%, transparent 50%);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+}
+.game {
+  width: 100%;
+  max-width: 640px;
+}
+
+/* top bar */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--pink-dark);
+  letter-spacing: -0.5px;
+}
+.logo span { color: var(--purple); }
+.hearts { display: flex; gap: 4px; }
+.heart { color: var(--pink); font-size: 18px; }
+.heart.lost { color: #f8bbd9; }
+.score-pill {
+  background: var(--pink-light);
+  border: 1.5px solid var(--pink-mid);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pink-dark);
+}
+
+/* progress */
+.progress-wrap {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.pip {
+  height: 8px;
+  border-radius: 4px;
+  flex: 1;
+  background: #f8bbd9;
+  transition: background 0.4s;
+}
+.pip.done { background: var(--pink); }
+.pip.current { background: var(--pink-mid); }
+
+/* scene card */
+.scene-card {
+  background: #fff;
+  border-radius: 24px;
+  border: 2px solid #f8bbd9;
+  padding: 22px;
+  margin-bottom: 14px;
+  animation: fadeUp 0.35s ease;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* character */
+.char-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.avatar {
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: var(--pink-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+  border: 2.5px solid var(--pink-mid);
+}
+.bubble {
+  background: var(--pink-light);
+  border-radius: 6px 18px 18px 18px;
+  padding: 11px 14px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--pink-dark);
+  flex: 1;
+  position: relative;
+}
+
+/* lesson badge */
+.lesson-badge {
+  display: inline-block;
+  background: var(--purple-light);
+  color: var(--purple);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  border: 1px solid #ce93d8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* concept title */
+.concept-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.concept-desc {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+
+/* code block */
+.code-block {
+  background: #1a1028;
+  border-radius: 14px;
+  padding: 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.9;
+  color: #f8bbd9;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  border: 1px solid #3d1a4e;
+}
+.kw  { color: #f48fb1; font-weight: 600; }
+.fn  { color: #ce93d8; }
+.st  { color: #80cbc4; }
+.cm  { color: #78909c; font-style: italic; }
+.num { color: #ffcc80; }
+.out { color: #a5d6a7; }
+
+/* quiz */
+.quiz-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+.quiz-q {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pink-dark);
+  background: var(--pink-light);
+  border-radius: 12px;
+  padding: 12px 15px;
+  margin-bottom: 12px;
+  border: 1px solid #f8bbd9;
+  line-height: 1.5;
+}
+.opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.opt {
+  background: #fff;
+  border: 1.5px solid #f8bbd9;
+  border-radius: 14px;
+  padding: 11px 15px;
+  font-size: 13px;
+  font-family: 'Quicksand', sans-serif;
+  cursor: pointer;
+  color: var(--text);
+  transition: all 0.15s;
+  text-align: left;
+  font-weight: 500;
+}
+.opt:hover:not(:disabled) { background: var(--pink-light); border-color: var(--pink-mid); }
+.opt.correct { background: var(--green-light); border-color: var(--green); color: #004d40; }
+.opt.wrong   { background: #fce4ec; border-color: #ef9a9a; color: var(--red); }
+.opt:disabled { cursor: default; }
+
+/* feedback */
+.feedback {
+  border-radius: 12px;
+  padding: 11px 15px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: none;
+  line-height: 1.5;
+}
+.feedback.show { display: block; }
+.feedback.win  { background: var(--green-light); color: #004d40; border: 1px solid #80cbc4; }
+.feedback.lose { background: #fff3e0; color: #bf360c; border: 1px solid #ffb74d; }
+
+/* nav */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+}
+.nav-info { font-size: 12px; color: var(--muted); font-weight: 600; }
+.btn {
+  padding: 10px 22px;
+  border-radius: 22px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 2px solid var(--pink);
+  color: var(--pink);
+  background: transparent;
+}
+.btn:hover { background: var(--pink-light); }
+.btn.primary {
+  background: var(--pink);
+  color: #fff;
+}
+.btn.primary:hover { background: var(--pink-dark); border-color: var(--pink-dark); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+
+/* output strip */
+.output-strip {
+  background: #1a1028;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: #a5d6a7;
+  margin-bottom: 14px;
+  border: 1px solid #3d1a4e;
+}
+.output-strip::before { content: '>>> output: '; color: #78909c; }
+
+/* final screen */
+.final {
+  text-align: center;
+  padding: 32px 16px;
+  animation: fadeUp 0.4s ease;
+}
+.final-emoji { font-size: 56px; margin-bottom: 12px; }
+.final-title { font-size: 24px; font-weight: 700; color: var(--pink-dark); margin-bottom: 8px; }
+.final-sub   { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--pink-light);
+  border-radius: 16px;
+  padding: 14px;
+  border: 1px solid #f8bbd9;
+}
+.stat-num  { font-size: 28px; font-weight: 700; color: var(--pink); }
+.stat-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+
+/* sparkle decorations */
+.sparkles {
+  position: relative;
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 6px;
+  letter-spacing: 4px;
+}
+</style>
+</head>
+<body>
+<div class="game">
+  <div class="topbar">
+    <div class="logo">pookie<span>.py</span></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div class="hearts" id="hearts"></div>
+      <div class="score-pill" id="score-pill">0 pts</div>
+    </div>
+  </div>
+
+  <div class="progress-wrap" id="progress"></div>
+  <div id="main"></div>
+</div>
+
+<script>
+const LESSONS = [
+  {
+    badge: "Chapter 1",
+    emoji: "🐍",
+    title: "Say hi with print()",
+    desc: "The very first thing every pookie coder learns — how to make Python talk! The print() function shows text on the screen.",
+    narration: "Omg bestie, welcome to Pookie.py! I'm Py, your coding bestie! Our first spell is super easy — we just make Python say something cute!",
+    code: `<span class="cm"># Tell Python to say something!</span>\n<span class="fn">print</span>(<span class="st">"hello, pookie!"</span>)\n<span class="fn">print</span>(<span class="st">"Python is so fun omg"</span>)`,
+    output: `hello, pookie!\nPython is so fun omg`,
+    question: "What does print() do in Python?",
+    options: [
+      { text: "Prints a physical document", correct: false },
+      { text: "Shows text on the screen", correct: true },
+      { text: "Deletes your code", correct: false },
+      { text: "Makes Python go faster", correct: false },
+    ],
+    win: "Yassss! print() literally just displays text. So easy! You're already coding bestie!",
+    lose: "Aww no worries! print() shows things on the screen — like telling Python to speak!",
+  },
+  {
+    badge: "Chapter 2",
+    emoji: "💅",
+    title: "Variables — your little storage boxes",
+    desc: "A variable is like a cute little box where you store information. You name the box, put something in it, and Python remembers it!",
+    narration: "Okay pookie, now we're gonna talk about variables. Think of them like your bag — you label it, put stuff inside, and grab it whenever!",
+    code: `<span class="cm"># name = value, that's it!</span>\nname = <span class="st">"Aria"</span>\nage = <span class="num">19</span>\nvibes = <span class="kw">True</span>\n\n<span class="fn">print</span>(name)\n<span class="fn">print</span>(age)\n<span class="fn">print</span>(<span class="st">"good vibes:"</span>, vibes)`,
+    output: `Aria\n19\ngood vibes: True`,
+    question: "What is a variable in Python?",
+    options: [
+      { text: "A type of error", correct: false },
+      { text: "A place to store data with a name", correct: true },
+      { text: "A function that prints things", correct: false },
+      { text: "A special pink keyword", correct: false },
+    ],
+    win: "Correct queen! Variables store data — name = 'Aria' means the box called name holds 'Aria' inside!",
+    lose: "No stress! Variables are just named boxes storing data. name = 'Aria' means name holds the value 'Aria'.",
+  },
+  {
+    badge: "Chapter 3",
+    emoji: "🌸",
+    title: "Lists — your collection bestie",
+    desc: "A list holds multiple things in one place — like a playlist or a shopping list. It uses square brackets [ ] and items are separated by commas.",
+    narration: "Girlie! Lists are my FAVE. Imagine you have a list of your fave songs — Python can store all of them in one variable!",
+    code: `<span class="cm"># a list of fave things</span>\nfaves = [<span class="st">"matcha"</span>, <span class="st">"cats"</span>, <span class="st">"Python"</span>]\n\n<span class="fn">print</span>(faves[<span class="num">0</span>])   <span class="cm"># first item</span>\n<span class="fn">print</span>(faves[<span class="num">2</span>])   <span class="cm"># third item</span>\n<span class="fn">print</span>(<span class="fn">len</span>(faves)) <span class="cm"># how many items</span>`,
+    output: `matcha\nPython\n3`,
+    question: "How do you access the FIRST item in a Python list called 'items'?",
+    options: [
+      { text: "items[1]", correct: false },
+      { text: "items.first()", correct: false },
+      { text: "items[0]", correct: true },
+      { text: "items(0)", correct: false },
+    ],
+    win: "Slay! Python starts counting from 0, not 1. So the first item is always at index 0!",
+    lose: "Oopsie! Python counts from 0, so items[0] gives you the first item. A little weird but you'll get it!",
+  },
+  {
+    badge: "Chapter 4",
+    emoji: "✨",
+    title: "if / else — making choices",
+    desc: "Python can make decisions! If something is true, do one thing — else, do another. It's like: if it's raining, take umbrella, else wear cute outfit.",
+    narration: "Bestie, if/else is how Python thinks! It checks a condition — if it's true, do this, otherwise do that. Your code just became smart!",
+    code: `mood = <span class="st">"happy"</span>\n\n<span class="kw">if</span> mood == <span class="st">"happy"</span>:\n    <span class="fn">print</span>(<span class="st">"yayyy let's goooo!"</span>)\n<span class="kw">else</span>:\n    <span class="fn">print</span>(<span class="st">"sending you hugs pookie"</span>)`,
+    output: `yayyy let's goooo!`,
+    question: "What does the 'else' block do in Python?",
+    options: [
+      { text: "It runs when the if condition is True", correct: false },
+      { text: "It always runs no matter what", correct: false },
+      { text: "It runs when the if condition is False", correct: true },
+      { text: "It stops the program", correct: false },
+    ],
+    win: "Exactly girlie! else runs when the if condition isn't true. Like a backup plan!",
+    lose: "The else block is the backup! It runs only when the if condition is False.",
+  },
+  {
+    badge: "Chapter 5",
+    emoji: "🔁",
+    title: "for loops — do it again bestie",
+    desc: "A for loop repeats code for each item in a list (or range). No more copy-pasting the same line 10 times!",
+    narration: "Okay this one is literally a life-saver. Instead of writing print() 100 times, you write a loop and Python does the work for you. Lazy girl coding!",
+    code: `girls = [<span class="st">"Aria"</span>, <span class="st">"Zoe"</span>, <span class="st">"Luna"</span>]\n\n<span class="kw">for</span> girl <span class="kw">in</span> girls:\n    <span class="fn">print</span>(girl, <span class="st">"is a pookie!"</span>)\n\n<span class="cm"># also works with range</span>\n<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">3</span>):\n    <span class="fn">print</span>(<span class="st">"loop"</span>, i)`,
+    output: `Aria is a pookie!\nZoe is a pookie!\nLuna is a pookie!\nloop 0\nloop 1\nloop 2`,
+    question: "What does a for loop do?",
+    options: [
+      { text: "Runs code only once", correct: false },
+      { text: "Repeats code for each item in a sequence", correct: true },
+      { text: "Makes a list longer", correct: false },
+      { text: "Checks if something is true", correct: false },
+    ],
+    win: "Yesss! A for loop repeats code for every item — super useful and very queen behavior!",
+    lose: "A for loop repeats code for each item in a sequence. It's Python doing the repetitive work so you don't have to!",
+  },
+  {
+    badge: "Chapter 6",
+    emoji: "💖",
+    title: "functions — your reusable spells",
+    desc: "A function is a block of code you can name and reuse. Define it once with def, then call it anytime. Like saving a recipe!",
+    narration: "Okay bestie we made it to the final chapter and it's the most powerful one — functions! You write the code ONCE and use it forever. Main character energy!",
+    code: `<span class="kw">def</span> <span class="fn">compliment</span>(name):\n    <span class="fn">print</span>(name, <span class="st">"is absolutely iconic!"</span>)\n\n<span class="cm"># call the function</span>\n<span class="fn">compliment</span>(<span class="st">"Aria"</span>)\n<span class="fn">compliment</span>(<span class="st">"Zoe"</span>)\n<span class="fn">compliment</span>(<span class="st">"you"</span>)`,
+    output: `Aria is absolutely iconic!\nZoe is absolutely iconic!\nyou is absolutely iconic!`,
+    question: "What keyword do you use to CREATE a function in Python?",
+    options: [
+      { text: "function", correct: false },
+      { text: "make", correct: false },
+      { text: "create", correct: false },
+      { text: "def", correct: true },
+    ],
+    win: "SLAY! def is the magic word! def function_name(): and you're off to the races!",
+    lose: "It's def! Short for 'define'. def my_function(): — that's how you make a function in Python!",
+  },
+];
+
+let current = 0;
+let score = 0;
+let lives = 3;
+let answered = false;
+
+function renderHearts() {
+  const el = document.getElementById('hearts');
+  el.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    const h = document.createElement('span');
+    h.className = 'heart' + (i >= lives ? ' lost' : '');
+    h.textContent = '♥';
+    el.appendChild(h);
+  }
+}
+
+function renderProgress() {
+  const el = document.getElementById('progress');
+  el.innerHTML = '';
+  for (let i = 0; i < LESSONS.length; i++) {
+    const p = document.createElement('div');
+    p.className = 'pip' + (i < current ? ' done' : i === current ? ' current' : '');
+    el.appendChild(p);
+  }
+}
+
+function renderScene(idx) {
+  answered = false;
+  const L = LESSONS[idx];
+  renderProgress();
+  document.getElementById('score-pill').textContent = score + ' pts';
+
+  const outputLines = L.output.split('\n').map(l => `<span class="out">${l}</span>`).join('\n');
+
+  document.getElementById('main').innerHTML = `
+    <div class="scene-card">
+      <div class="lesson-badge">${L.badge} of ${LESSONS.length}</div>
+      <div class="char-row">
+        <div class="avatar">${L.emoji}</div>
+        <div class="bubble">${L.narration}</div>
+      </div>
+      <div class="concept-title">${L.title}</div>
+      <div class="concept-desc">${L.desc}</div>
+      <div class="code-block">${L.code}</div>
+      <div class="output-strip" style="white-space:pre;font-size:11.5px">${outputLines}</div>
+
+      <div class="quiz-label">Quick check!</div>
+      <div class="quiz-q">${L.question}</div>
+      <div class="opts" id="opts">
+        ${L.options.map((o, i) => `<button class="opt" onclick="answer(${i})">${o.text}</button>`).join('')}
+      </div>
+      <div class="feedback" id="feedback"></div>
+      <div class="nav">
+        <span class="nav-info">${idx + 1} / ${LESSONS.length}</span>
+        <button class="btn primary" id="next-btn" onclick="nextScene()" disabled>
+          ${idx === LESSONS.length - 1 ? 'Finish!' : 'Next chapter'}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function answer(idx) {
+  if (answered) return;
+  answered = true;
+  const L = LESSONS[current];
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach(o => o.disabled = true);
+
+  const correct = L.options[idx].correct;
+  opts[idx].classList.add(correct ? 'correct' : 'wrong');
+
+  if (!correct) {
+    lives = Math.max(0, lives - 1);
+    renderHearts();
+    L.options.forEach((o, i) => { if (o.correct) opts[i].classList.add('correct'); });
+  } else {
+    score += 100;
+    document.getElementById('score-pill').textContent = score + ' pts';
+  }
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'win' : 'lose');
+  fb.textContent = (correct ? '✓ ' : '') + (correct ? L.win : L.lose);
+
+  document.getElementById('next-btn').disabled = false;
+}
+
+function nextScene() {
+  current++;
+  if (current >= LESSONS.length) {
+    renderFinal();
+  } else {
+    renderScene(current);
+  }
+}
+
+function renderFinal() {
+  const total = LESSONS.length * 100;
+  const pct = Math.round((score / total) * 100);
+  let emoji = pct >= 80 ? '👑' : pct >= 50 ? '🌸' : '💪';
+  let title = pct >= 80 ? "You're a Python queen!" : pct >= 50 ? "Not bad, pookie!" : "Keep going bestie!";
+  let sub = pct >= 80
+    ? "Omg you slayed every chapter! You literally just learned the fundamentals of Python. Go off!"
+    : pct >= 50
+    ? "You got the vibes! A little more practice and you'll be unstoppable. You've got this!"
+    : "Every queen starts somewhere! Go back, re-read the chapters, and try again. You're amazing!";
+
+  document.getElementById('progress').innerHTML = Array.from({length: LESSONS.length}, () => '<div class="pip done"></div>').join('');
+  document.getElementById('main').innerHTML = `
+    <div class="scene-card final">
+      <div class="sparkles">✦ ✦ ✦</div>
+      <div class="final-emoji">${emoji}</div>
+      <div class="final-title">${title}</div>
+      <div class="final-sub">${sub}</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-num">${score}</div><div class="stat-label">Points earned</div></div>
+        <div class="stat-card"><div class="stat-num">${pct}%</div><div class="stat-label">Accuracy</div></div>
+        <div class="stat-card"><div class="stat-num">${lives}</div><div class="stat-label">Hearts left</div></div>
+        <div class="stat-card"><div class="stat-num">6</div><div class="stat-label">Chapters done</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()" style="width:100%">Play again!</button>
+    </div>
+  `;
+}
+
+function restart() {
+  current = 0; score = 0; lives = 3;
+  renderHearts();
+  renderScene(0);
+}
+
+renderHearts();
+renderScene(0);
+</script>
+</body>
+</html>
